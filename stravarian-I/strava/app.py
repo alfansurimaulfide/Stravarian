@@ -2,13 +2,16 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 import os
+from strava.auth import auth
+from strava.strava import strava 
+from strava.dashboard import dashboard
+
 db = SQLAlchemy()
 
 def create_app():
 
     app = Flask(__name__)
 
-    from routes import auth, strava, dashboard
     app.register_blueprint(auth)
     app.register_blueprint(strava)
     app.register_blueprint(dashboard)

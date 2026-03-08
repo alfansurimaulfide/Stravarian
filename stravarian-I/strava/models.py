@@ -1,8 +1,8 @@
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin
 from datetime import datetime, timedelta
-# db = SQLAlchemy()
-from app import db
+db = SQLAlchemy()
+# from strava.app import db
 
 class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)

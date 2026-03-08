@@ -1,4 +1,4 @@
-from app import create_app
+from strava.app import create_app
 from flask import Blueprint
 
 app = create_app()

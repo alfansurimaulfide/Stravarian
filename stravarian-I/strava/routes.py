@@ -3,7 +3,7 @@ import os
 from dotenv import load_dotenv
 from datetime import datetime, timedelta
 import requests
-from models import db, User
+from strava.models import db, User
 
 #all routes related variable are specified here, ideally each (auth, strava, dashboard) should represent subpackages. but at least temporarily they are put here together
 
