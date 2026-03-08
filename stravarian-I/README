@@ -1,0 +1,4 @@
+1. python -m venv .venv
+2. .\Scripts\activate
+3. pip install -r requirements.txt
+4. create .env (put in .gitignore) that contain CLIENT_ID, CLIENT_SECRET, REDIRECT_URI within strava-app directly
