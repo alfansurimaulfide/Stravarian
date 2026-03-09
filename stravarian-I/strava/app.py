@@ -5,8 +5,8 @@ import os
 from strava.auth import auth
 from strava.strava import strava 
 from strava.dashboard import dashboard
-
-db = SQLAlchemy()
+from strava.models import db
+from strava import models
 
 def create_app():
 
@@ -17,7 +17,7 @@ def create_app():
     app.register_blueprint(dashboard)
 
     # For local testing, SQLite database in project folder
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users.db'
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///user.db'
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     app.secret_key = os.getenv("SECRET_KEY", "supersecret")
 

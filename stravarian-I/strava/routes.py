@@ -19,6 +19,7 @@ REDIRECT_URI = os.getenv("REDIRECT_URI")
 
 @auth.route("strava/connect")
 def auth():
+    print("executing auth route")
     url = (
         "https://www.strava.com/oauth/authorize"
         f"?client_id={CLIENT_ID}"
@@ -33,6 +34,7 @@ def auth():
 #currently only use callback mechanism, webhook (if necessary) will be explored later
 @strava.route("/strava/callback")
 def strava():
+    print("executing strava route")
     code = request.args.get("code")
 
     response = requests.post(
@@ -62,7 +64,7 @@ def strava():
 
     db.session.commit()
 
-    return redirect(url_for("dashboard.home"))
+    return redirect(url_for("strava.strava_callback"))
     # return "Connected to Strava!"
 
 def get_activities(user):

@@ -1,0 +1,3 @@
+current problem: 
+
+- 20260310: how to make get_the_activities modular from callback

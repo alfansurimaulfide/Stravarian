@@ -15,8 +15,9 @@ CLIENT_ID = os.getenv("CLIENT_ID")
 CLIENT_SECRET = os.getenv("CLIENT_SECRET")
 REDIRECT_URI = os.getenv("REDIRECT_URI")
 
-@auth.route("strava/connect")
-def auth():
+@auth.route("/strava/connect")
+def oauth():
+    print("executing auth route")
     url = (
         "https://www.strava.com/oauth/authorize"
         f"?client_id={CLIENT_ID}"

@@ -2,3 +2,8 @@
 2. .\Scripts\activate
 3. pip install -r requirements.txt
 4. create .env (put in .gitignore) that contain CLIENT_ID, CLIENT_SECRET, REDIRECT_URI within strava-app directly
+5. $env:FLASK_APP = "run.py" 
+6. flask db_init
+7. flask db migrate -m "initial tables"
+8. flask db ugrade
+9. python -m run

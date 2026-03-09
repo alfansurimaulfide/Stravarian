@@ -17,8 +17,10 @@ REDIRECT_URI = os.getenv("REDIRECT_URI")
 
 #currently only use callback mechanism, webhook (if necessary) will be explored later
 @strava.route("/strava/callback")
-def strava():
+def strava_callback():
+    print("executing strava route")
     code = request.args.get("code")
+    print("code: ", code)
 
     response = requests.post(
         "https://www.strava.com/oauth/token",
@@ -31,6 +33,8 @@ def strava():
     )
 
     token_data = response.json()
+
+    print("token_data is: ", token_data)
 
     strava_id = token_data["athlete"]["id"]
     user = User.query.filter_by(strava_id=strava_id).first()
@@ -46,6 +50,19 @@ def strava():
     user.refresh_token = token_data["refresh_token"]
 
     db.session.commit()
+
+    response = requests.get(
+        "https://www.strava.com/api/v3/athlete/activities",
+        headers={"Authorization": f"Bearer {user.strava_token}"},
+        params={
+            "per_page": 200,
+            "page": 1
+        }
+    )
+
+    print("response page 1")
+
+    print(response.json())
 
     return redirect(url_for("dashboard.home"))
     # return "Connected to Strava!"
