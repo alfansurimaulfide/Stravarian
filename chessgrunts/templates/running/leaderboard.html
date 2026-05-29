@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+{% block title %}{{ event.name }} — Leaderboard{% endblock %}
+{% block content %}
+
+<div class="page-header">
+  <p class="page-label">// running · leaderboard</p>
+  <h1 class="page-title"><span class="accent-run">{{ event.name }}</span></h1>
+  <p class="page-subtitle">
+    {{ event.start_date.strftime('%d %b') }} → {{ event.end_date.strftime('%d %b %Y') }}
+    {% if event.target_distance %}· {{ (event.target_distance/1000)|int }} km target{% endif %}
+  </p>
+</div>
+
+<div class="flex gap-8 mb-32">
+  {% if not my_membership %}
+    <form method="POST" action="{{ url_for('running.join_event', event_id=event.id) }}">
+      <button type="submit" class="btn-run btn" style="padding:10px 20px; font-size:12px; border-radius:2px;">
+        Join this event →
+      </button>
+    </form>
+  {% else %}
+    <span class="badge badge-win" style="padding:8px 14px; font-size:11px;">✓ Joined</span>
+  {% endif %}
+  <a href="{{ url_for('running.events') }}" class="btn-ghost" style="padding:10px 20px; font-size:12px;">← All events</a>
+</div>
+
+<!-- Leaderboard table -->
+<div class="card">
+  <div class="card-header">
+    <span class="card-title">Leaderboard</span>
+    <span class="text-dim" style="font-size:11px;">{{ board | length }} athletes</span>
+  </div>
+  {% if board %}
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Athlete</th>
+          <th>Distance</th>
+          <th>Avg Pace</th>
+          <th>Runs</th>
+          <th>Time</th>
+          <th>Progress</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in board %}
+        {% set rank = loop.index %}
+        <tr {% if row.user.id == current_user.id %}style="background:rgba(232,255,74,.04);"{% endif %}>
+          <td class="rank-col rank-{{ rank }}">{{ rank }}</td>
+          <td>
+            <div style="display:flex; align-items:center; gap:10px;">
+              {% if row.user.avatar_url %}
+                <img src="{{ row.user.avatar_url }}" class="avatar" />
+              {% else %}
+                <span class="avatar-placeholder">{{ row.user.username[0].upper() }}</span>
+              {% endif %}
+              <span class="syne" style="font-size:14px;">{{ row.user.username }}</span>
+              {% if row.user.id == current_user.id %}
+                <span class="badge badge-draw">you</span>
+              {% endif %}
+            </div>
+          </td>
+          <td>
+            <span class="syne text-run" style="font-size:18px;">{{ '%.1f' % (row.total_distance / 1000) }}</span>
+            <span class="text-dim" style="font-size:11px;"> km</span>
+          </td>
+          <td class="mono" style="font-size:13px;">
+            {% if row.avg_pace %}
+              {{ (row.avg_pace // 60) | int }}:{{ '%02d' % (row.avg_pace % 60) | int }}/km
+            {% else %}—{% endif %}
+          </td>
+          <td class="mono">{{ row.run_count }}</td>
+          <td class="mono" style="font-size:12px; color:var(--text-muted);">
+            {% if row.total_time %}
+              {{ (row.total_time // 3600) }}h {{ ((row.total_time % 3600) // 60) }}m
+            {% else %}—{% endif %}
+          </td>
+          <td style="min-width:120px;">
+            {% if event.target_distance and event.target_distance > 0 %}
+              {% set pct = [(row.total_distance / event.target_distance * 100), 100] | min %}
+              <div class="leaderboard-bar">
+                <div class="progress-bar">
+                  <div class="progress-fill progress-run" data-width="{{ pct }}" style="width:0"></div>
+                </div>
+                <span class="mono" style="font-size:11px; color:var(--text-dim); min-width:36px;">{{ pct | int }}%</span>
+              </div>
+            {% else %}
+              <span class="text-dim" style="font-size:11px;">—</span>
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+    <div style="padding:48px; text-align:center; color:var(--text-dim);">
+      <p>No participants yet. Be the first to join!</p>
+    </div>
+  {% endif %}
+</div>
+
+{% endblock %}

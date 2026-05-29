@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block title %}ChessGrunts — Body & Mind Combined{% endblock %}
+{% block content %}
+
+<section class="hero">
+  <p class="hero-eyebrow">/// the sport for the complete athlete</p>
+  <h1 class="hero-title">
+    <span class="line-run">RUN.</span><br>
+    <span class="line-chess">CHESS.</span><br>
+    <span class="line-combo">CONQUER.</span>
+  </h1>
+  <p class="hero-desc">
+    Track your runs via Strava, your chess rating across platforms, and combine them
+    in the ultimate discipline — ChessGrunts. Sprint. Play. Repeat.
+  </p>
+  <div class="hero-cta">
+    {% if current_user.is_authenticated %}
+      <a href="{{ url_for('chessgrunts.dashboard') }}" class="btn-primary btn">Enter the arena</a>
+      <a href="{{ url_for('running.dashboard') }}" class="btn-ghost btn">View runs</a>
+    {% else %}
+      <a href="{{ url_for('auth.register') }}" class="btn-primary btn">Start now — free</a>
+      <a href="{{ url_for('auth.login') }}" class="btn-ghost btn">Sign in</a>
+    {% endif %}
+  </div>
+</section>
+
+<div class="feature-row">
+  <div class="feature-col">
+    <div class="feature-accent text-run">⏱</div>
+    <div class="feature-title">Running</div>
+    <p class="feature-desc">
+      Connect Strava for automatic sync every hour. Join events, climb leaderboards,
+      track pace, distance, elevation across all your runs and walks.
+    </p>
+  </div>
+  <div class="feature-col">
+    <div class="feature-accent text-chess">♟</div>
+    <div class="feature-title">Chess</div>
+    <p class="feature-desc">
+      Pull your game history from Chess.com and Lichess. Separate leaderboards for
+      Bullet, Blitz, and Rapid. Challenge registered members to casual games.
+    </p>
+  </div>
+  <div class="feature-col">
+    <div class="feature-accent text-combo">⚡</div>
+    <div class="feature-title">ChessgRunts</div>
+    <p class="feature-desc">
+      The default format: 400 m sprint → Bullet chess. Repeat ×4. A combined score
+      rewards both physical pace and chess performance. Schedule events, log results.
+    </p>
+  </div>
+</div>
+
+{% endblock %}

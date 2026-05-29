@@ -1,0 +1,133 @@
+{% extends "base.html" %}
+{% block title %}Running — ChessGrunts{% endblock %}
+{% block content %}
+
+<div class="page-header flex justify-between items-center">
+  <div>
+    <p class="page-label">// running</p>
+    <h1 class="page-title"><span class="accent-run">RUN</span></h1>
+  </div>
+  <div class="flex gap-8">
+    {% if not current_user.strava_connected %}
+      <a href="{{ url_for('auth.strava_connect') }}" class="btn-run btn" style="padding:10px 20px; font-size:12px; border-radius:2px;">
+        Connect Strava
+      </a>
+    {% else %}
+      <a href="{{ url_for('running.manual_sync') }}" class="btn-ghost" style="padding:10px 20px; font-size:12px;">↻ Sync</a>
+    {% endif %}
+    <a href="{{ url_for('running.events') }}" class="btn-outline-run btn" style="padding:10px 20px; font-size:12px; border-radius:2px;">
+      Events →
+    </a>
+  </div>
+</div>
+
+{% if not current_user.strava_connected %}
+<div class="connect-banner">
+  <div class="connect-banner-text">
+    <div class="connect-banner-title">Connect Strava to start tracking</div>
+    Your runs and walks will be imported automatically every hour.
+  </div>
+  <a href="{{ url_for('auth.strava_connect') }}" class="btn-run btn" style="padding:10px 20px; font-size:12px; border-radius:2px; white-space:nowrap;">
+    Connect Strava →
+  </a>
+</div>
+{% endif %}
+
+<!-- Stats -->
+{% if activities %}
+{% set total_dist = activities | sum(attribute='distance') %}
+{% set total_time = activities | sum(attribute='moving_time') %}
+<div class="stats-grid mb-32">
+  <div class="stat-card stat-run">
+    <span class="stat-label">Total Distance</span>
+    <span class="stat-value" data-animate="{{ (total_dist / 1000) | round(1) }}" data-decimals="1" data-suffix=" km">
+      {{ (total_dist / 1000) | round(1) }} km
+    </span>
+    <span class="stat-sub">Last 10 activities</span>
+  </div>
+  <div class="stat-card">
+    <span class="stat-label">Total Time</span>
+    <span class="stat-value" style="font-size:22px;">
+      {% set h = (total_time // 3600) %}
+      {% set m = ((total_time % 3600) // 60) %}
+      {{ h }}h {{ m }}m
+    </span>
+    <span class="stat-sub">Moving time</span>
+  </div>
+  <div class="stat-card">
+    <span class="stat-label">Activities</span>
+    <span class="stat-value" data-animate="{{ activities | length }}">{{ activities | length }}</span>
+    <span class="stat-sub">Runs & walks</span>
+  </div>
+  <div class="stat-card stat-run">
+    <span class="stat-label">Avg Pace</span>
+    <span class="stat-value" style="font-size:22px;">
+      {% if total_dist > 0 %}
+        {% set pace = total_time / (total_dist / 1000) %}
+        {{ (pace // 60) | int }}:{{ '%02d' % (pace % 60) | int }}/km
+      {% else %}—{% endif %}
+    </span>
+    <span class="stat-sub">Overall average</span>
+  </div>
+</div>
+{% endif %}
+
+<!-- Recent activities -->
+<div class="section-label"><span>Recent Activities</span></div>
+
+<div class="card">
+  {% if activities %}
+    {% for act in activities %}
+    <div class="activity-item">
+      <div class="activity-icon">
+        {% if act.sport_type == 'Walk' %}🚶{% else %}🏃{% endif %}
+      </div>
+      <div>
+        <div class="activity-name">{{ act.name or 'Unnamed Activity' }}</div>
+        <div class="activity-meta">
+          {{ act.start_date.strftime('%a %d %b %Y · %H:%M') if act.start_date else '—' }}
+          · {{ act.sport_type }}
+        </div>
+      </div>
+      <div class="activity-stats">
+        <div class="activity-dist text-run">{{ '%.2f' % (act.distance / 1000) }} km</div>
+        <div class="activity-pace">
+          {% if act.pace_per_km() %}
+            {{ (act.pace_per_km() // 60) | int }}:{{ '%02d' % (act.pace_per_km() % 60) | int }}/km
+          {% else %}—{% endif %}
+          · {{ (act.moving_time // 60) }}m
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  {% else %}
+    <div style="padding:48px; text-align:center; color:var(--text-dim);">
+      <div style="font-size:48px; margin-bottom:12px;">🏃</div>
+      <p>No activities yet. Connect Strava to import your runs.</p>
+    </div>
+  {% endif %}
+</div>
+
+<!-- Active events -->
+{% if events %}
+<div class="section-label mt-32"><span>Active Events</span></div>
+<div class="grid-3">
+  {% for event in events %}
+  <a href="{{ url_for('running.leaderboard', event_id=event.id) }}" class="event-card">
+    <div class="event-card-date">
+      {{ event.start_date.strftime('%d %b') }} → {{ event.end_date.strftime('%d %b %Y') }}
+    </div>
+    <div class="event-card-name">{{ event.name }}</div>
+    <div class="event-card-meta">
+      {{ event.memberships.count() }} athletes
+      {% if event.target_distance %}· {{ (event.target_distance / 1000) | round(0) | int }} km target{% endif %}
+    </div>
+    {% if event.id in my_events %}
+      <div class="mt-8"><span class="badge badge-win">Joined</span></div>
+    {% endif %}
+  </a>
+  {% endfor %}
+</div>
+{% endif %}
+
+{% endblock %}

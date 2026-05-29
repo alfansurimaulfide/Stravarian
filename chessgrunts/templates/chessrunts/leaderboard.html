@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% block title %}ChessGrunts Global Leaderboard{% endblock %}
+{% block content %}
+
+<div class="page-header">
+  <p class="page-label">// chessgrunts · global leaderboard</p>
+  <h1 class="page-title"><span class="accent-combo">HALL OF</span> FAME</h1>
+</div>
+
+<div class="card">
+  {% if board %}
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Athlete</th>
+          <th>Score</th>
+          <th>Event</th>
+          <th>Run</th>
+          <th>Chess</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in board %}
+        {% set rank = loop.index %}
+        <tr>
+          <td class="rank-col rank-{{ rank }}">{{ rank }}</td>
+          <td>
+            <div style="display:flex; align-items:center; gap:10px;">
+              {% if row.user.avatar_url %}
+                <img src="{{ row.user.avatar_url }}" class="avatar" />
+              {% else %}
+                <span class="avatar-placeholder">{{ row.user.username[0].upper() }}</span>
+              {% endif %}
+              <span class="syne" style="font-size:14px;">{{ row.user.username }}</span>
+            </div>
+          </td>
+          <td class="syne text-combo" style="font-size:24px;">{{ row.session.combined_score }}</td>
+          <td style="font-size:13px;">
+            <a href="{{ url_for('chessgrunts.event_detail', event_id=row.session.event_id) }}" class="text-muted">
+              {{ row.session.event.name if row.session.event else '—' }}
+            </a>
+          </td>
+          <td class="mono text-run" style="font-size:12px;">{{ row.session.total_run_distance | int }}m</td>
+          <td class="mono" style="font-size:12px;">
+            <span style="color:var(--success);">{{ row.session.chess_wins }}W</span>
+            <span style="color:var(--text-muted);"> {{ row.session.chess_draws }}D</span>
+            <span style="color:var(--danger);"> {{ row.session.chess_losses }}L</span>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div style="padding:64px; text-align:center; color:var(--text-dim);">
+    <p>No results logged yet.</p>
+  </div>
+  {% endif %}
+</div>
+
+{% endblock %}

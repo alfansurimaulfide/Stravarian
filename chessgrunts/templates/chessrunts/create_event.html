@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block title %}Create ChessgRunts Event{% endblock %}
+{% block content %}
+
+<div class="page-header">
+  <p class="page-label">// chessgrunts · new event</p>
+  <h1 class="page-title"><span class="accent-combo">NEW</span> EVENT</h1>
+</div>
+
+<div style="max-width:560px;">
+  <form method="POST">
+    <div class="form-group">
+      <label class="form-label">Event Name</label>
+      <input type="text" name="name" class="form-input" placeholder="e.g. Saturday ChessgRunts" required />
+    </div>
+    <div class="form-group">
+      <label class="form-label">Description</label>
+      <textarea name="description" class="form-input" placeholder="What's the plan?"></textarea>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Scheduled Date & Time</label>
+      <input type="datetime-local" name="scheduled_at" class="form-input" />
+    </div>
+    <div class="grid-3">
+      <div class="form-group">
+        <label class="form-label">Run Distance (m)</label>
+        <input type="number" name="run_distance" class="form-input" value="400" min="100" step="50" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Intervals</label>
+        <input type="number" name="intervals" class="form-input" value="4" min="1" max="20" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Chess Time Control</label>
+        <select name="chess_time_control" class="form-input">
+          <option value="bullet">Bullet (1min)</option>
+          <option value="blitz">Blitz (3-5min)</option>
+          <option value="rapid">Rapid (10min+)</option>
+        </select>
+      </div>
+    </div>
+    <button type="submit" class="btn-combo btn" style="padding:12px 28px; font-size:13px; border-radius:2px;">
+      Create Event →
+    </button>
+  </form>
+</div>
+
+{% endblock %}

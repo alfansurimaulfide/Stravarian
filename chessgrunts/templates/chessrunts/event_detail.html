@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+{% block title %}{{ event.name }} — ChessGrunts{% endblock %}
+{% block content %}
+
+<div class="page-header">
+  <p class="page-label">// chessgrunts · event</p>
+  <h1 class="page-title"><span class="accent-combo">{{ event.name }}</span></h1>
+  <p class="page-subtitle">
+    {{ event.run_distance | int }}m run × {{ event.intervals }} intervals ·
+    {{ event.chess_time_control }} chess
+    {% if event.scheduled_at %}· {{ event.scheduled_at.strftime('%a %d %b %Y · %H:%M') }}{% endif %}
+  </p>
+</div>
+
+{% if event.description %}
+<p style="color:var(--text-muted); font-size:14px; max-width:560px; margin-bottom:32px;">{{ event.description }}</p>
+{% endif %}
+
+<!-- Log/update session -->
+<div class="card mb-32" style="border-left:3px solid var(--combo);">
+  <div class="card-header">
+    <span class="card-title">{{ 'Update my session' if my_session else 'Log my session' }}</span>
+  </div>
+  <div class="card-body">
+    <form method="POST" action="{{ url_for('chessgrunts.log_session', event_id=event.id) }}">
+      <div class="grid-3">
+        <div class="form-group">
+          <label class="form-label">Total Run Distance (m)</label>
+          <input type="number" name="total_run_distance" class="form-input"
+                 value="{{ my_session.total_run_distance if my_session else (event.run_distance * event.intervals) }}"
+                 placeholder="e.g. 1600" min="0" step="1" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Total Run Time (seconds)</label>
+          <input type="number" name="total_run_time" class="form-input"
+                 value="{{ my_session.total_run_time if my_session else '' }}"
+                 placeholder="e.g. 480" min="0" />
+        </div>
+        <div></div>
+        <div class="form-group">
+          <label class="form-label">Chess Wins</label>
+          <input type="number" name="chess_wins" class="form-input"
+                 value="{{ my_session.chess_wins if my_session else 0 }}" min="0" max="{{ event.intervals }}" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Chess Draws</label>
+          <input type="number" name="chess_draws" class="form-input"
+                 value="{{ my_session.chess_draws if my_session else 0 }}" min="0" max="{{ event.intervals }}" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Chess Losses</label>
+          <input type="number" name="chess_losses" class="form-input"
+                 value="{{ my_session.chess_losses if my_session else 0 }}" min="0" max="{{ event.intervals }}" />
+        </div>
+      </div>
+      <button type="submit" class="btn-combo btn" style="padding:10px 24px; font-size:12px; border-radius:2px;">
+        {{ 'Update session' if my_session else 'Log session' }} →
+      </button>
+    </form>
+  </div>
+</div>
+
+<!-- Leaderboard -->
+<div class="section-label"><span>Leaderboard</span></div>
+<div class="card">
+  {% if board %}
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Athlete</th>
+          <th>Score</th>
+          <th>Run</th>
+          <th>Chess W/D/L</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in board %}
+        {% set rank = loop.index %}
+        <tr {% if row.user.id == current_user.id %}style="background:rgba(255,107,74,.05);"{% endif %}>
+          <td class="rank-col rank-{{ rank }}">{{ rank }}</td>
+          <td>
+            <div style="display:flex; align-items:center; gap:10px;">
+              {% if row.user.avatar_url %}
+                <img src="{{ row.user.avatar_url }}" class="avatar" />
+              {% else %}
+                <span class="avatar-placeholder">{{ row.user.username[0].upper() }}</span>
+              {% endif %}
+              <span class="syne" style="font-size:14px;">{{ row.user.username }}</span>
+            </div>
+          </td>
+          <td class="syne text-combo" style="font-size:24px;">{{ row.session.combined_score }}</td>
+          <td class="mono" style="font-size:12px;">
+            {{ row.session.total_run_distance | int }}m
+            {% if row.session.total_run_time %}
+              · {{ (row.session.total_run_time // 60) }}:{{ '%02d' % (row.session.total_run_time % 60) }}
+            {% endif %}
+          </td>
+          <td class="mono">
+            <span style="color:var(--success);">{{ row.session.chess_wins }}</span> /
+            <span style="color:var(--text-muted);">{{ row.session.chess_draws }}</span> /
+            <span style="color:var(--danger);">{{ row.session.chess_losses }}</span>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div style="padding:48px; text-align:center; color:var(--text-dim);">
+    <p>No results yet. Log your session above to be first!</p>
+  </div>
+  {% endif %}
+</div>
+
+{% endblock %}

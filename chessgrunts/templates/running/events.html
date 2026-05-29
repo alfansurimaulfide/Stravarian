@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block title %}Run Events — ChessGrunts{% endblock %}
+{% block content %}
+
+<div class="page-header flex justify-between items-center">
+  <div>
+    <p class="page-label">// running · events</p>
+    <h1 class="page-title"><span class="accent-run">EVENTS</span></h1>
+  </div>
+  <a href="{{ url_for('running.create_event') }}" class="btn-run btn" style="padding:10px 20px; font-size:12px; border-radius:2px;">
+    + Create event
+  </a>
+</div>
+
+{% if events %}
+<div class="grid-3">
+  {% for event in events %}
+  <a href="{{ url_for('running.leaderboard', event_id=event.id) }}" class="event-card">
+    <div class="event-card-date">
+      {{ event.start_date.strftime('%d %b') }} → {{ event.end_date.strftime('%d %b %Y') }}
+    </div>
+    <div class="event-card-name">{{ event.name }}</div>
+    {% if event.description %}
+    <p class="event-card-meta" style="margin-bottom:10px;">{{ event.description[:80] }}{% if event.description|length > 80 %}…{% endif %}</p>
+    {% endif %}
+    <div class="event-card-meta flex gap-8">
+      <span>{{ event.memberships.count() }} athletes</span>
+      {% if event.target_distance %}
+        <span>· {{ (event.target_distance/1000)|int }} km goal</span>
+      {% endif %}
+    </div>
+    {% if not event.is_active %}<div class="mt-8"><span class="badge badge-draw">Ended</span></div>{% endif %}
+  </a>
+  {% endfor %}
+</div>
+{% else %}
+<div style="padding:80px; text-align:center; color:var(--text-dim);">
+  <div style="font-size:64px; margin-bottom:16px;">🏁</div>
+  <p style="margin-bottom:24px;">No events yet. Create the first one!</p>
+  <a href="{{ url_for('running.create_event') }}" class="btn-run btn" style="padding:10px 20px; font-size:12px; border-radius:2px;">
+    Create event →
+  </a>
+</div>
+{% endif %}
+
+{% endblock %}

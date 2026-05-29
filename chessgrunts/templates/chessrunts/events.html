@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block title %}ChessGrunts Events{% endblock %}
+{% block content %}
+
+<div class="page-header flex justify-between items-center">
+  <div>
+    <p class="page-label">// chessgrunts · events</p>
+    <h1 class="page-title"><span class="accent-combo">EVENTS</span></h1>
+  </div>
+  <a href="{{ url_for('chessgrunts.create_event') }}" class="btn-combo btn" style="padding:10px 20px; font-size:12px; border-radius:2px;">
+    + Create event
+  </a>
+</div>
+
+{% if events %}
+<div class="grid-3">
+  {% for event in events %}
+  <a href="{{ url_for('chessgrunts.event_detail', event_id=event.id) }}" class="event-card">
+    {% if event.scheduled_at %}
+    <div class="event-card-date">{{ event.scheduled_at.strftime('%a %d %b %Y · %H:%M') }}</div>
+    {% endif %}
+    <div class="event-card-name">{{ event.name }}</div>
+    <p class="event-card-meta" style="margin-bottom:10px;">
+      {{ event.run_distance | int }}m run × {{ event.intervals }} intervals
+    </p>
+    <div class="flex gap-8 items-center">
+      <span class="badge badge-{{ event.chess_time_control }}">{{ event.chess_time_control }} chess</span>
+      <span class="text-dim" style="font-size:11px;">{{ event.sessions.count() }} results</span>
+    </div>
+  </a>
+  {% endfor %}
+</div>
+{% else %}
+<div style="padding:80px; text-align:center; color:var(--text-dim);">
+  <div style="font-size:64px; margin-bottom:16px;">⚡</div>
+  <p style="margin-bottom:24px;">No events yet.</p>
+  <a href="{{ url_for('chessgrunts.create_event') }}" class="btn-combo btn" style="padding:10px 20px; font-size:12px; border-radius:2px;">
+    Create first event →
+  </a>
+</div>
+{% endif %}
+
+{% endblock %}

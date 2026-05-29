@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block title %}Join — ChessGrunts{% endblock %}
+{% block content %}
+<div class="auth-wrap">
+  <p class="page-label">// create account</p>
+  <h1 class="auth-title">Join the<br>arena.</h1>
+  <p class="auth-sub">One account for running, chess, and ChessGrunts events.</p>
+
+  <form method="POST" action="{{ url_for('auth.register') }}">
+    <div class="form-group">
+      <label class="form-label">Username</label>
+      <input type="text" name="username" class="form-input" placeholder="speedchessmaster" required autofocus />
+    </div>
+    <div class="form-group">
+      <label class="form-label">Email</label>
+      <input type="email" name="email" class="form-input" placeholder="you@example.com" required />
+    </div>
+    <div class="form-group">
+      <label class="form-label">Password</label>
+      <input type="password" name="password" class="form-input" placeholder="min. 8 characters" required minlength="8" />
+    </div>
+    <button type="submit" class="btn-primary btn" style="width:100%; padding:12px; font-size:13px; justify-content:center;">
+      Create account →
+    </button>
+  </form>
+
+  <p class="auth-link">
+    Already a member? <a href="{{ url_for('auth.login') }}">Sign in</a>
+  </p>
+</div>
+{% endblock %}

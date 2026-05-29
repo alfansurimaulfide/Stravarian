@@ -1,0 +1,116 @@
+{% extends "base.html" %}
+{% block title %}ChessGrunts — Dashboard{% endblock %}
+{% block content %}
+
+<div class="page-header flex justify-between items-center">
+  <div>
+    <p class="page-label">// chessgrunts</p>
+    <h1 class="page-title"><span class="accent-combo">CHESS</span>RUNTS</h1>
+    <p class="page-subtitle">Sprint. Play. Repeat. The sport for the complete athlete.</p>
+  </div>
+  <div class="flex gap-8">
+    <a href="{{ url_for('chessgrunts.events') }}" class="btn-outline-combo btn" style="padding:10px 20px; font-size:12px; border-radius:2px;">
+      All events →
+    </a>
+    <a href="{{ url_for('chessgrunts.create_event') }}" class="btn-combo btn" style="padding:10px 20px; font-size:12px; border-radius:2px;">
+      + Create
+    </a>
+  </div>
+</div>
+
+<!-- Default format explainer -->
+<div class="card mb-32" style="border-left:3px solid var(--combo);">
+  <div class="card-header">
+    <span class="card-title text-combo">⚡ Default Format</span>
+  </div>
+  <div class="card-body">
+    <p class="text-muted" style="font-size:13px; margin-bottom:20px;">
+      400 m interval run followed by 1 bullet chess game. Repeat 4 times.
+      Your combined score = chess points × 10 + run speed bonus.
+    </p>
+    <div class="interval-viz">
+      {% for i in range(4) %}
+        <div class="interval-block">
+          <div class="interval-run">🏃</div>
+          <span class="interval-label">400m</span>
+        </div>
+        <div class="interval-arrow">→</div>
+        <div class="interval-block">
+          <div class="interval-chess">♟</div>
+          <span class="interval-label">Bullet</span>
+        </div>
+        {% if not loop.last %}<div class="interval-arrow">→</div>{% endif %}
+      {% endfor %}
+    </div>
+  </div>
+</div>
+
+<!-- Upcoming events -->
+{% if upcoming %}
+<div class="section-label"><span>Upcoming Events</span></div>
+<div class="grid-3 mb-32">
+  {% for event in upcoming %}
+  <a href="{{ url_for('chessgrunts.event_detail', event_id=event.id) }}" class="event-card">
+    <div class="event-card-date">
+      {% if event.scheduled_at %}{{ event.scheduled_at.strftime('%a %d %b · %H:%M') }}{% else %}TBD{% endif %}
+    </div>
+    <div class="event-card-name">{{ event.name }}</div>
+    <div class="event-card-meta">
+      {{ event.run_distance | int }}m × {{ event.intervals }} ·
+      <span class="badge badge-{{ event.chess_time_control }}" style="font-size:10px;">{{ event.chess_time_control }}</span>
+    </div>
+  </a>
+  {% endfor %}
+</div>
+{% endif %}
+
+<!-- My recent sessions -->
+{% if past_sessions %}
+<div class="section-label"><span>My Sessions</span></div>
+<div class="card">
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Event</th>
+          <th>Distance</th>
+          <th>Chess W/D/L</th>
+          <th>Score</th>
+          <th>Date</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for session in past_sessions %}
+        <tr>
+          <td class="syne" style="font-size:14px;">
+            <a href="{{ url_for('chessgrunts.event_detail', event_id=session.event_id) }}" class="text-combo">
+              {{ session.event.name if session.event else '—' }}
+            </a>
+          </td>
+          <td class="mono text-run">{{ '%.0f' % session.total_run_distance }} m</td>
+          <td class="mono">
+            <span style="color:var(--success);">{{ session.chess_wins }}</span> /
+            <span style="color:var(--text-muted);">{{ session.chess_draws }}</span> /
+            <span style="color:var(--danger);">{{ session.chess_losses }}</span>
+          </td>
+          <td class="syne text-combo" style="font-size:20px;">{{ session.combined_score }}</td>
+          <td class="mono text-muted" style="font-size:12px;">
+            {{ session.created_at.strftime('%d %b %Y') }}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% else %}
+<div style="padding:48px; text-align:center; color:var(--text-dim);">
+  <div style="font-size:48px; margin-bottom:12px;">⚡</div>
+  <p style="margin-bottom:16px;">No sessions logged yet. Join an event to get started.</p>
+  <a href="{{ url_for('chessgrunts.events') }}" class="btn-combo btn" style="padding:10px 20px; font-size:12px; border-radius:2px;">
+    Browse events →
+  </a>
+</div>
+{% endif %}
+
+{% endblock %}

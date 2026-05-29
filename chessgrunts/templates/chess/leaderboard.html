@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+{% block title %}Chess Leaderboard — ChessGrunts{% endblock %}
+{% block content %}
+
+<div class="page-header">
+  <p class="page-label">// chess · leaderboard</p>
+  <h1 class="page-title"><span class="accent-chess">RANKINGS</span></h1>
+</div>
+
+<div class="tc-tabs">
+  {% for t in time_controls %}
+  <a href="?tc={{ t }}" class="tc-tab {% if tc == t %}active{% endif %}">{{ t }}</a>
+  {% endfor %}
+</div>
+
+<div class="card">
+  {% if board %}
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Player</th>
+          <th>Win Rate</th>
+          <th>W / D / L</th>
+          <th>Games</th>
+          <th>Latest Rating</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in board %}
+        {% set rank = loop.index %}
+        <tr {% if row.user.id == current_user.id %}style="background:rgba(74,255,218,.04);"{% endif %}>
+          <td class="rank-col rank-{{ rank }}">{{ rank }}</td>
+          <td>
+            <div style="display:flex; align-items:center; gap:10px;">
+              {% if row.user.avatar_url %}
+                <img src="{{ row.user.avatar_url }}" class="avatar" />
+              {% else %}
+                <span class="avatar-placeholder">{{ row.user.username[0].upper() }}</span>
+              {% endif %}
+              <div>
+                <div class="syne" style="font-size:14px;">{{ row.user.username }}</div>
+                <div style="font-size:11px; color:var(--text-dim);">
+                  {% if row.user.chessdotcom_username %}chess.com: {{ row.user.chessdotcom_username }}{% endif %}
+                  {% if row.user.lichess_username %}lichess: {{ row.user.lichess_username }}{% endif %}
+                </div>
+              </div>
+            </div>
+          </td>
+          <td>
+            <div class="leaderboard-bar">
+              <div class="progress-bar" style="max-width:100px;">
+                <div class="progress-fill progress-chess" data-width="{{ row.win_rate }}" style="width:0"></div>
+              </div>
+              <span class="syne text-chess" style="font-size:16px;">{{ row.win_rate }}%</span>
+            </div>
+          </td>
+          <td class="mono" style="font-size:13px;">
+            <span style="color:var(--success);">{{ row.wins }}</span> /
+            <span style="color:var(--text-muted);">{{ row.draws }}</span> /
+            <span style="color:var(--danger);">{{ row.losses }}</span>
+          </td>
+          <td class="mono">{{ row.total }}</td>
+          <td class="syne" style="font-size:18px;">{{ row.latest_rating or '—' }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div style="padding:48px; text-align:center; color:var(--text-dim);">
+    <p>No players yet. Add your chess username in your profile to join the leaderboard.</p>
+  </div>
+  {% endif %}
+</div>
+
+{% endblock %}

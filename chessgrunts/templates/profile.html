@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+{% block title %}Profile — ChessGrunts{% endblock %}
+{% block content %}
+
+<div class="page-header">
+  <p class="page-label">// athlete profile</p>
+  <h1 class="page-title">{{ current_user.username }}</h1>
+  <p class="page-subtitle">Connect your platforms and manage your account.</p>
+</div>
+
+<div class="grid-2">
+
+  <!-- Strava -->
+  <div class="card">
+    <div class="card-header">
+      <span class="card-title text-run">⏱ Strava Connection</span>
+      {% if current_user.strava_connected %}
+        <span class="badge badge-win">Connected</span>
+      {% else %}
+        <span class="badge badge-draw">Not connected</span>
+      {% endif %}
+    </div>
+    <div class="card-body">
+      {% if current_user.strava_connected %}
+        <p class="text-muted" style="font-size:13px; margin-bottom:16px;">
+          Your Strava account is connected. Activities sync every hour automatically.
+        </p>
+        <a href="{{ url_for('running.manual_sync') }}" class="btn-outline-run btn" style="padding:8px 16px; font-size:12px; border-radius:2px;">
+          ↻ Sync now
+        </a>
+      {% else %}
+        <p class="text-muted" style="font-size:13px; margin-bottom:16px;">
+          Connect Strava to import your runs and walks automatically. Required to join run leaderboards.
+        </p>
+        <a href="{{ url_for('auth.strava_connect') }}" class="btn-run btn" style="padding:8px 18px; font-size:12px; border-radius:2px; display:inline-flex;">
+          Connect Strava →
+        </a>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- Chess platforms -->
+  <div class="card">
+    <div class="card-header">
+      <span class="card-title text-chess">♟ Chess Platforms</span>
+    </div>
+    <div class="card-body">
+      <form method="POST" action="{{ url_for('auth.update_profile') }}">
+        <div class="form-group">
+          <label class="form-label">Chess.com Username</label>
+          <input type="text" name="chessdotcom_username" class="form-input"
+                 value="{{ current_user.chessdotcom_username or '' }}"
+                 placeholder="your_chess_com_username" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Lichess Username</label>
+          <input type="text" name="lichess_username" class="form-input"
+                 value="{{ current_user.lichess_username or '' }}"
+                 placeholder="your_lichess_username" />
+        </div>
+        <button type="submit" class="btn-chess btn" style="padding:8px 18px; font-size:12px; border-radius:2px;">
+          Save & Sync Chess →
+        </button>
+      </form>
+    </div>
+  </div>
+
+</div>
+
+<!-- Account info -->
+<div class="card mt-24">
+  <div class="card-header">
+    <span class="card-title">Account</span>
+  </div>
+  <div class="card-body">
+    <div class="grid-3">
+      <div>
+        <p class="form-label">Email</p>
+        <p style="font-size:13px;">{{ current_user.email }}</p>
+      </div>
+      <div>
+        <p class="form-label">Member since</p>
+        <p style="font-size:13px;">{{ current_user.created_at.strftime('%b %Y') }}</p>
+      </div>
+      <div>
+        <p class="form-label">Actions</p>
+        <a href="{{ url_for('auth.logout') }}" class="btn-ghost" style="display:inline-block;">Sign out</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

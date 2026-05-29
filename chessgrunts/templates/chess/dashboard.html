@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+{% block title %}Chess — ChessGrunts{% endblock %}
+{% block content %}
+
+<div class="page-header flex justify-between items-center">
+  <div>
+    <p class="page-label">// chess</p>
+    <h1 class="page-title"><span class="accent-chess">CHESS</span></h1>
+  </div>
+  <div class="flex gap-8">
+    <a href="{{ url_for('chess.manual_sync') }}" class="btn-ghost" style="padding:10px 20px; font-size:12px;">↻ Sync</a>
+    <a href="{{ url_for('chess.leaderboard') }}?tc={{ tc }}" class="btn-outline-chess btn" style="padding:10px 20px; font-size:12px; border-radius:2px;">
+      Leaderboard →
+    </a>
+  </div>
+</div>
+
+{% if not current_user.chessdotcom_username and not current_user.lichess_username %}
+<div class="connect-banner" style="border-left-color:var(--chess);">
+  <div class="connect-banner-text">
+    <div class="connect-banner-title">Add your chess username</div>
+    Go to your profile and enter your Chess.com or Lichess username to import games.
+  </div>
+  <a href="{{ url_for('main.profile') }}" class="btn-chess btn" style="padding:10px 20px; font-size:12px; border-radius:2px; white-space:nowrap;">
+    Set up profile →
+  </a>
+</div>
+{% endif %}
+
+<!-- Time control tabs -->
+<div class="tc-tabs">
+  {% for t in time_controls %}
+  <a href="?tc={{ t }}" class="tc-tab {% if tc == t %}active{% endif %}">{{ t }}</a>
+  {% endfor %}
+</div>
+
+<!-- Stats -->
+<div class="stats-grid mb-32">
+  <div class="stat-card stat-chess">
+    <span class="stat-label">Win Rate</span>
+    <span class="stat-value" data-animate="{{ stats.win_rate }}" data-decimals="1" data-suffix="%">{{ stats.win_rate }}%</span>
+    <span class="stat-sub">{{ tc }} games</span>
+  </div>
+  <div class="stat-card">
+    <span class="stat-label">Games</span>
+    <span class="stat-value" data-animate="{{ stats.total }}">{{ stats.total }}</span>
+    <span class="stat-sub">W{{ stats.wins }} / D{{ stats.draws }} / L{{ stats.losses }}</span>
+  </div>
+  <div class="stat-card stat-chess">
+    <span class="stat-label">Latest Rating</span>
+    <span class="stat-value" data-animate="{{ stats.latest_rating or 0 }}">{{ stats.latest_rating or '—' }}</span>
+    <span class="stat-sub">Current</span>
+  </div>
+  <div class="stat-card">
+    <span class="stat-label">Peak Rating</span>
+    <span class="stat-value" data-animate="{{ stats.peak_rating or 0 }}">{{ stats.peak_rating or '—' }}</span>
+    <span class="stat-sub">All time</span>
+  </div>
+</div>
+
+<!-- Recent games -->
+<div class="section-label"><span>Recent {{ tc }} Games</span></div>
+
+<div class="card">
+  {% if games %}
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Result</th>
+          <th>Opponent</th>
+          <th>Color</th>
+          <th>Rating</th>
+          <th>Platform</th>
+          <th>Date</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for game in games %}
+        <tr>
+          <td><span class="badge badge-{{ game.result }}">{{ game.result }}</span></td>
+          <td class="syne" style="font-size:14px;">{{ game.opponent_username or '—' }}</td>
+          <td style="font-size:18px;">{{ '♔' if game.color == 'white' else '♚' }}</td>
+          <td class="mono">
+            {{ game.user_rating or '—' }}
+            {% if game.opponent_rating %}
+              <span class="text-dim">vs {{ game.opponent_rating }}</span>
+            {% endif %}
+          </td>
+          <td>
+            <span class="badge {% if game.platform == 'lichess' %}badge-blitz{% else %}badge-rapid{% endif %}">
+              {{ 'lichess' if game.platform == 'lichess' else 'chess.com' }}
+            </span>
+          </td>
+          <td class="mono text-muted" style="font-size:12px;">
+            {{ game.played_at.strftime('%d %b %Y') if game.played_at else '—' }}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div style="padding:48px; text-align:center; color:var(--text-dim);">
+    <div style="font-size:48px; margin-bottom:12px;">♟</div>
+    <p>No {{ tc }} games found. Add your chess username to start importing.</p>
+  </div>
+  {% endif %}
+</div>
+
+{% endblock %}
